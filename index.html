@@ -1,0 +1,641 @@
+<!--
+ACADEMIA DA REDAÇÃO - RPG VISUAL NOVEL
+VERSÃO CINEMÁTICA
+-->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Academia da Redação</title>
+
+<style>
+
+@import url('EJH.jpg');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    font-family:'Orbitron', sans-serif;
+    background:black;
+}
+
+/* ========================= */
+/* CENÁRIO */
+/* ========================= */
+
+.scene{
+    width:100vw;
+    height:100vh;
+    position:relative;
+
+    background:
+    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.65)),
+    url("EJH.jpg");
+
+    background-size:cover;
+    background-position:center;
+
+    transition:1s;
+}
+
+/* ========================= */
+/* PERSONAGEM */
+/* ========================= */
+
+.character{
+
+    position: absolute;
+
+    bottom:190px;
+
+    left:1025px;
+
+    width:340px;
+
+    transition:1s;
+
+    animation: idle 2s infinite ease-in-out;
+
+    filter: drop-shadow(0 0 20px rgba(0,0,0,.7));
+}
+
+@keyframes idle{
+
+    0%{
+        transform:translateY(0px);
+    }
+
+    50%{
+        transform:translateY(-10px);
+    }
+
+    100%{
+        transform:translateY(0px);
+    }
+}
+
+/* ========================= */
+/* NOME */
+/* ========================= */
+
+.name-box{
+    position: absolute;
+    top: -25px;
+    left: 20px;
+    background: #00d9ff;
+    color: black;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 10px 10px 0px 0px;
+}
+
+/* ========================= */
+/* DIALOGO */
+/* ========================= */
+
+.dialogue-box{
+
+    position:absolute;
+
+    bottom:0;
+
+    width:75%;
+
+    min-height:260px;
+
+    background:rgba(5,5,15,.94);
+
+    border-top:6px solid #00d9ff;
+
+    padding:40px;
+
+    color:white;
+
+    backdrop-filter:blur(5px);
+}
+
+.text{
+
+    font-size:22px;
+
+    line-height:1.8;
+
+    min-height:120px;
+}
+
+/* ========================= */
+/* ESCOLHAS */
+/* ========================= */
+
+.choices{
+
+    margin-top:25px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+}
+
+.choice{
+
+    padding:18px;
+
+    border:none;
+
+    background:#151528;
+
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+    border-left:5px solid #00d9ff;
+
+    transition:.25s;
+}
+
+.choice:hover{
+
+    transform:translateX(10px);
+
+    background:#00d9ff;
+
+    color:black;
+}
+
+/* ========================= */
+/* XP */
+/* ========================= */
+
+.xp-container{
+
+    position:absolute;
+
+    top:20px;
+
+    left:20px;
+
+    width:350px;
+
+    height:35px;
+
+    border:3px solid white;
+
+    background:#222;
+}
+
+.xp-bar{
+
+    height:100%;
+
+    width:0%;
+
+    background:linear-gradient(90deg,#00d9ff,#00ff88);
+
+    transition:.5s;
+}
+
+.xp-text{
+
+    position:absolute;
+
+    top:65px;
+
+    left:20px;
+
+    color:white;
+}
+
+/* ========================= */
+/* EFEITO */
+/* ========================= */
+
+.fade{
+
+    animation:fade 1s;
+}
+
+@keyframes fade{
+
+    from{
+        opacity:0;
+    }
+
+    to{
+        opacity:1;
+    }
+}
+
+/* ========================= */
+/* TITULO */
+/* ========================= */
+
+.title{
+
+    position:absolute;
+
+    top:40px;
+
+    width:100%;
+
+    text-align:center;
+
+    color:white;
+
+    font-size:50px;
+
+    text-shadow:4px 4px 0px black;
+}
+
+/* ========================= */
+
+</style>
+</head>
+<body>
+
+<div class="scene" id="scene">
+
+    <div class="title">
+        ACADEMIA DA REDAÇÃO
+    </div>
+
+    <!-- XP -->
+
+    <div class="xp-container">
+        <div class="xp-bar" id="xpBar"></div>
+    </div>
+
+    <div class="xp-text">
+        XP de Redação
+    </div>
+
+    <!-- PERSONAGEM -->
+
+    <img
+    src="nerd.jpg"
+    class="character"
+    id="character"
+    >
+
+    <!-- NOME -->
+
+    
+
+    <!-- DIALOGO -->
+
+    <div class="dialogue-box">
+        <div class="name-box" id="nameBox">
+            Professor Jaicon
+        </div>
+        <div class="text fade" id="text">
+
+            Bem-vindo ao Cedup...
+            <br><br>
+            Aqui, cada palavra possui peso.
+            Apenas os melhores dominam a arte
+            do texto dissertativo-argumentativo.
+
+        </div>
+
+        <div class="choices" id="choices">
+
+            <button class="choice" onclick="startStory()">
+                Iniciar Jornada
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let xp = 0;
+
+const text = document.getElementById("text");
+const choices = document.getElementById("choices");
+const xpBar = document.getElementById("xpBar");
+const scene = document.getElementById("scene");
+const nameBox = document.getElementById("nameBox");
+
+function addXP(value){
+
+    xp += value;
+
+    if(xp > 100){
+        xp = 100;
+    }
+
+    xpBar.style.width = xp + "%";
+}
+
+/* ========================= */
+/* INICIO */
+/* ========================= */
+
+function startStory(){
+
+    scene.style.background =
+    `
+    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.65)),
+    url("Aesthetic school hall.jpg")
+    `;
+
+    scene.style.backgroundSize = "cover";
+
+    text.innerHTML =
+
+    `
+    Você acaba de entrar na Sala de aula DS302.
+    <br><br>
+    Todos os estudantes sonham em alcançar
+    o título de Mestre da Redação.
+    <br><br>
+    Porém...
+    apenas aqueles capazes de estruturar
+    ideias conseguem sobreviver aos desafios.
+    `;
+
+    choices.innerHTML =
+
+    `
+    <button class="choice" onclick="introPhase()">
+        Proseguir para o primeiro desafio
+    </button>
+    `;
+}
+
+/* ========================= */
+/* INTRODUÇÃO */
+/* ========================= */
+
+function introPhase(){
+
+    nameBox.innerHTML = "Professor Orion";
+
+    text.innerHTML =
+
+    `
+    Primeiro desafio:
+    <br><br>
+    Uma redação precisa começar
+    apresentando o tema e a tese.
+    <br><br>
+    Sem introdução...
+    o leitor estará perdido.
+    `;
+
+    choices.innerHTML =
+
+    `
+    <button class="choice" onclick="correctIntro()">
+        Apresentar tema e opinião
+    </button>
+
+    <button class="choice" onclick="wrongAnswer()">
+        Falar sobre o significado do assunto
+    </button>
+
+    <button class="choice" onclick="wrongAnswer()">
+        Apresentar dados estatísticos do tema
+    </button>
+    `;
+}
+
+function correctIntro(){
+
+    addXP(35);
+
+    text.innerHTML =
+
+    `
+    Excelente...
+    <br><br>
+    Você compreendeu o poder da introdução.
+    <br><br>
+    Agora será levado ao setor proibido:
+    o corredor dos argumentos.
+    `;
+
+    choices.innerHTML =
+
+    `
+    <button class="choice" onclick="developmentPhase()">
+        Afundar nas profundezas dos argumentos
+    </button>
+    `;
+}
+
+/* ========================= */
+/* DESENVOLVIMENTO */
+/* ========================= */
+
+function developmentPhase(){
+
+    scene.style.background =
+    `
+    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.65)),
+    url("download.jpg")
+    `;
+
+    nameBox.innerHTML = "Guardião dos Argumentos";
+
+    text.innerHTML =
+
+    `
+    Aqui é onde muitos falham...
+    <br><br>
+    O desenvolvimento sustenta a tese.
+    <br><br>
+    Escolha um argumento válido
+    sobre inclusão social.
+    `;
+
+    choices.innerHTML =
+
+    `
+    
+    <button class="choice" onclick="wrongAnswer()">
+        Inclusão social é um tema sensível
+    </button>
+
+    <button class="choice" onclick="correctDevelopment()">
+        A falta de acessibilidade exclui pessoas
+    </button>
+
+    <button class="choice" onclick="wrongAnswer()">
+        Pessoas com deficiência enfrentam desafios diários
+    </button>
+    `;
+}
+
+function correctDevelopment(){
+
+    addXP(35);
+
+    text.innerHTML =
+
+    `
+    Impressionante...
+    <br><br>
+    Seus argumentos estão ficando cada vez mais fortes.
+    <br><br>
+    Mas ainda resta o desafio final:
+    finalizando sua jornada, conclua o que você começou.
+    `;
+
+    choices.innerHTML =
+
+    `
+    <button class="choice" onclick="finalPhase()">
+        Enfrentar desafio final
+    </button>
+    `;
+}
+
+/* ========================= */
+/* CONCLUSÃO */
+/* ========================= */
+
+function finalPhase(){
+
+    scene.style.background =
+    `
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75)),
+    url("Liminal Classroom.jpg")
+    `;
+
+    nameBox.innerHTML = "Mestre da Redação";
+
+    text.innerHTML =
+
+    `
+    Última etapa...
+    <br><br>
+    Toda conclusão precisa apresentar
+    solução e fechamento lógico.
+    <br><br>
+    Escolha sabiamente.
+    `;
+
+    choices.innerHTML =
+
+    `
+    
+    <button class="choice" onclick="badEnding()">
+        Utilizar a tecnologia para criar espaços que as pessoas se sintam confortaveis
+    </button>
+
+    <button class="choice" onclick="badEnding()">
+        Defender a ideia de que a inclusão social é um processo complexo
+    </button>
+
+    <button class="choice" onclick="goodEnding()">
+        Investir em educação e acessibilidade
+    </button>
+
+    `;
+}
+
+/* ========================= */
+/* FINAL BOM */
+/* ========================= */
+
+function goodEnding(){
+
+    addXP(30);
+
+    scene.style.background =
+    `
+    linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.6)),
+    url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070")
+    `;
+
+    nameBox.innerHTML = "Professor Jaicon";
+
+    text.innerHTML =
+
+    `
+    PARABÉNS.
+    <br><br>
+    Você dominou as três estruturas
+    do texto dissertativo-argumentativo.
+    <br><br>
+    Seu nome será lembrado
+    na proxima edição do ENEM.
+    `;
+
+    choices.innerHTML =
+
+    `
+    <button class="choice" onclick="location.reload()">
+        Jogar Novamente
+    </button>
+    `;
+}
+
+/* ========================= */
+/* FINAL RUIM */
+/* ========================= */
+
+function badEnding(){
+
+    text.innerHTML =
+
+    `
+    Sua argumentação falhou...
+    <br><br>
+    Você decepcionou o Professor Jaicon.
+    <br><br>,
+    Agora... Passe o resto da eternidade estudando.
+    `;
+
+    choices.innerHTML =
+
+    `
+    <button class="choice" onclick="finalPhase()">
+        Tentar Novamente
+    </button>
+    `;
+}
+
+/* ========================= */
+/* ERRO */
+/* ========================= */
+
+function wrongAnswer(){
+
+    text.innerHTML =
+
+    `
+    (Voz do Professor Jaicon ecoando) Resposta incorreta...
+    <br><br>
+    Pense melhor na estrutura
+    da redação.
+    `;
+
+    choices.innerHTML =
+
+    `
+    <button class="choice" onclick="introPhase()">
+        Voltar
+    </button>
+    `;
+}
+
+</script>
+
+</body>
+</html>
